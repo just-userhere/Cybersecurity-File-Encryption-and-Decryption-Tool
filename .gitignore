@@ -1,0 +1,49 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+*.egg
+
+# Test & coverage artefacts
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+*.log
+
+# Test-generated and temporary encrypted files
+*.enc
+*_decrypted.*
+/tests/tmp_*
+/tmp_*
+
+# IDE / editor settings
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Local configuration / secrets (never commit these)
+.env
+*.pem
+*.key
+config.local.json
+secrets.txt
+passwords.txt
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
