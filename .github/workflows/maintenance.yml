@@ -1,0 +1,41 @@
+# CipherGuard automated repository maintenance.
+#
+# Runs approximately every five days (120 hours) and refreshes the
+# maintenance metadata timestamp in maintenance/status.json.
+# GitHub Actions cron has no native "every 120 hours" interval, so the
+# schedule uses a calendar-based five-day cadence: days 1, 6, 11, 16, 21,
+# 26, and 31 of each month at 04:37 UTC (~6 runs/month ~= every 5 days).
+# Scheduled runs can occasionally be delayed during high Actions load.
+
+name: Automated Maintenance
+
+on:
+  schedule:
+    - cron: "37 4 1,6,11,16,21,26,31 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  maintenance:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Update maintenance timestamp
+        run: |
+          python3 -c "import datetime, json; p='maintenance/status.json'; d=json.load(open(p)); d['last_updated']=datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'); json.dump(d, open(p,'w'), indent=2); open(p,'a').write('\n')"
+
+      - name: Commit and push if changed
+        run: |
+          if git diff --quiet -- maintenance/status.json; then
+            echo "No maintenance changes to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add maintenance/status.json
+          git commit -m "chore: update automated maintenance status"
+          git push origin HEAD:master

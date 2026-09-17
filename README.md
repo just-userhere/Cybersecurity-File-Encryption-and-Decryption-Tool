@@ -175,6 +175,18 @@ Covered scenarios:
 
 (Deliberately not implemented — this stays a mini project.)
 
+### Automated Repository Maintenance
+
+CipherGuard includes a GitHub Actions maintenance workflow that periodically updates repository maintenance metadata approximately every five days (120 hours). The workflow creates a maintenance commit when the metadata changes.
+
+Details:
+
+- Workflow: `.github/workflows/maintenance.yml`
+- Schedule: calendar-based five-day cadence — days 1, 6, 11, 16, 21, 26, and 31 of each month at 04:37 UTC (`37 4 1,6,11,16,21,26,31 * *`), roughly 6 runs per month ≈ once every five days. GitHub Actions cron has no native "every 120 hours" interval, so this calendar pattern is used instead. Scheduled runs can occasionally be delayed during periods of high Actions load.
+- Manual runs are also supported via `workflow_dispatch`.
+- Each run refreshes the `last_updated` timestamp in `maintenance/status.json` and pushes a `chore: update automated maintenance status` commit to `master` only when the file actually changed (no empty commits).
+- These commits update maintenance metadata only and do not represent new application features. Core files (`encryption.py`, `main.py`, tests, cryptographic parameters) are never touched by automation.
+
 ## Project Structure
 
 ```
@@ -185,6 +197,11 @@ CipherGuard/
 ├── README.md
 ├── .gitignore
 ├── LICENSE
+├── .github/
+│   └── workflows/
+│       └── maintenance.yml
+├── maintenance/
+│   └── status.json
 ├── tests/
 │   └── test_encryption.py
 └── assets/
